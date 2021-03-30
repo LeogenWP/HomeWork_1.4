@@ -7,7 +7,6 @@ public class FizzBuzz {
     public FizzBuzz(int n) {
         this.n = n;
     }
-
     public synchronized void fizz() {
         while (tmp <= n) {
             if(tmp % 3 == 0 && tmp % 5 != 0) {
@@ -22,9 +21,6 @@ public class FizzBuzz {
                 }
             }
         }
-
-
-
     }
     public synchronized void buzz() {
         while (tmp <= n) {
@@ -40,8 +36,6 @@ public class FizzBuzz {
                 }
             }
         }
-
-
     }
     public synchronized void fizzbuzz() {
         while (tmp <= n) {
@@ -57,8 +51,6 @@ public class FizzBuzz {
                 }
             }
         }
-
-
     }
     public synchronized void number() {
         while (tmp <= n) {
