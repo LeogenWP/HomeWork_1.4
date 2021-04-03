@@ -1,17 +1,19 @@
 package task2;
 
-public class FizzBuzz {
-    private volatile int n;
-    private volatile int tmp = 1;
+import java.util.concurrent.atomic.AtomicInteger;
 
+public class FizzBuzz {
+    AtomicInteger originNumber = new AtomicInteger();
+    AtomicInteger tmpNumber = new AtomicInteger();
     public FizzBuzz(int n) {
-        this.n = n;
+        originNumber.set(n);
+        tmpNumber.set(1);
     }
     public synchronized void fizz() {
-        while (tmp <= n) {
-            if(tmp % 3 == 0 && tmp % 5 != 0) {
+        while (tmpNumber.get() <= originNumber.get()) {
+            if(tmpNumber.get() % 3 == 0 && tmpNumber.get() % 5 != 0) {
                 System.out.print("fizz" +",");
-                tmp++;
+                tmpNumber.getAndAdd(1);
                 notifyAll();
             } else {
                 try {
@@ -23,10 +25,10 @@ public class FizzBuzz {
         }
     }
     public synchronized void buzz() {
-        while (tmp <= n) {
-            if(tmp % 3 != 0 && tmp % 5 == 0)  {
+        while (tmpNumber.get() <= originNumber.get()) {
+            if(tmpNumber.get() % 3 != 0 && tmpNumber.get() % 5 == 0)  {
                 System.out.print("buzz" +",");
-                tmp++;
+                tmpNumber.getAndAdd(1);
                 notifyAll();
             } else {
                 try {
@@ -38,10 +40,10 @@ public class FizzBuzz {
         }
     }
     public synchronized void fizzbuzz() {
-        while (tmp <= n) {
-            if(tmp % 3 == 0 && tmp % 5 == 0) {
+        while (tmpNumber.get() <= originNumber.get()) {
+            if(tmpNumber.get() % 3 == 0 && tmpNumber.get() % 5 == 0) {
                 System.out.print("fizzbuzz" +",");
-                tmp++;
+                tmpNumber.getAndAdd(1);
                 notifyAll();
             } else {
                 try {
@@ -53,16 +55,16 @@ public class FizzBuzz {
         }
     }
     public synchronized void number() {
-        while (tmp <= n) {
-            if (tmp % 3 == 0 || tmp % 5 == 0) {
+        while (tmpNumber.get() <= originNumber.get()) {
+            if (tmpNumber.get() % 3 == 0 || tmpNumber.get() % 5 == 0) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             } else {
-                System.out.print(tmp +",");
-                tmp ++;
+                System.out.print(tmpNumber.get() +",");
+                tmpNumber.getAndAdd(1);
             }
         }
     }
