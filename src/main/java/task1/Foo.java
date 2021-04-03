@@ -1,12 +1,14 @@
 package task1;
 
-public class Foo {
-    private boolean f1 = true;
-    private boolean f2 = false;
-    private boolean f3 = false;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-    public synchronized void first() {
-        while(!f1) {
+public class Foo {
+    AtomicBoolean f1 = new AtomicBoolean(true);
+    AtomicBoolean f2 = new AtomicBoolean(false);
+    AtomicBoolean f3 = new AtomicBoolean(false);
+
+    public  void first() {
+        while(!f1.get()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -14,12 +16,12 @@ public class Foo {
             }
         }
         System.out.print("first");
-        f1 = false;
-        f2 = true;
+        f1.getAndSet(false);
+        f2.getAndSet(true);
         notifyAll();
     }
-    public synchronized void second() {
-        while(!f2) {
+    public  void second() {
+        while(!f2.get()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -27,14 +29,13 @@ public class Foo {
             }
         }
         System.out.print("second");
-
-        f2 = false;
-        f3 = true;
+        f2.getAndSet(false);
+        f3.getAndSet(true);
         notifyAll();
 
     }
-    public synchronized void third() {
-        while(!f3) {
+    public  void third() {
+        while(!f3.get()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -43,8 +44,8 @@ public class Foo {
         }
 
         System.out.print("third");
-        f3 = false;
-        f1 = true;
+        f3.getAndSet(false);
+        f1.getAndSet(true);
         notifyAll();
     }
 
