@@ -1,16 +1,11 @@
 package task1;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Foo {
-    AtomicBoolean f1 = new AtomicBoolean(true);
-    AtomicBoolean f2 = new AtomicBoolean(false);
-    AtomicBoolean f3 = new AtomicBoolean(false);
-
-    public synchronized String first() {
-        while(!f1.get()) {
+    AtomicInteger atomInt = new AtomicInteger(1);
+    public synchronized void first() {
+        while(atomInt.get() != 1) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -18,13 +13,11 @@ public class Foo {
             }
         }
         System.out.print("first");
-        f1.getAndSet(false);
-        f2.getAndSet(true);
+        atomInt.getAndSet(2);
         notifyAll();
-        return "first";
     }
-    public synchronized String second() {
-        while(!f2.get()) {
+    public synchronized void second() {
+        while(atomInt.get() != 2) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -32,55 +25,27 @@ public class Foo {
             }
         }
         System.out.print("second");
-        f2.getAndSet(false);
-        f3.getAndSet(true);
+        atomInt.getAndSet(3);
         notifyAll();
-        return "second";
-
     }
-    public synchronized String third() {
-        while(!f3.get()) {
+    public synchronized void third() {
+        while(atomInt.get() != 3) {
             try {
                 wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
         System.out.print("third");
-        f3.getAndSet(false);
-        f1.getAndSet(true);
+        atomInt.getAndSet(1);
         notifyAll();
-        return "third";
     }
 
     public static void main(String[] args) {
         Foo foo = new Foo();
-        CompletableFuture<String> future2
-                = CompletableFuture.supplyAsync(foo::second);
-        CompletableFuture<String> future1
-                = CompletableFuture.supplyAsync(foo::first);
-        CompletableFuture<String> future3
-                = CompletableFuture.supplyAsync(foo::third);
-
-        CompletableFuture<Void> combinedFuture
-                = CompletableFuture.allOf(future1,future2,future3);
-
-        try {
-            combinedFuture.get();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }catch (Exception e ) {
-            System.out.println("Something has been crashed");
-        }
-
-        //assertTrue(future1.isDone());
-        //assertTrue(future2.isDone());
-        //assertTrue(future3.isDone());
-
+        new Thread(foo::third).start();
+        new Thread(foo::second).start();
+        new Thread(foo::first).start();
 
     }
 }
